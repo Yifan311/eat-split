@@ -23,26 +23,21 @@ const initialFriends = [
 ];
 
 export default function App() {
-  return (
-    <div className="app">
-      <SplitBill />
-    </div>
-  );
-}
-
-function SplitBill() {
   const [selectedId, setSelectedId] = React.useState(null);
   function handleSelectId(id) {
     setSelectedId((preId) => (id === preId ? null : id));
   }
   return (
-    <div>
-      <FriendList
-        friends={initialFriends}
-        onSelectId={handleSelectId}
-        selectedId={selectedId}
-      />
-      <AddFriend />
+    <div className="app">
+      <div className="sidebar">
+        <FriendList
+          friends={initialFriends}
+          onSelectId={handleSelectId}
+          selectedId={selectedId}
+        />
+        <AddFriend />
+      </div>
+
       <SplitBillForm />
     </div>
   );
@@ -50,7 +45,7 @@ function SplitBill() {
 
 function FriendList({ friends, onSelectId, selectedId }) {
   return (
-    <form className="sidebar">
+    <form>
       <ul>
         {friends.map((friend) => (
           <li key={friend.id}>
@@ -82,7 +77,17 @@ function FriendList({ friends, onSelectId, selectedId }) {
 }
 
 function AddFriend() {
-  return <div></div>;
+  return (
+    <form className="form-add-friend">
+      <label>👫 Friend name</label>
+      <input type="text" />
+
+      <label>🌄 Image URL</label>
+      <input type="text" />
+
+      <button className="button">Add</button>
+    </form>
+  );
 }
 
 function SplitBillForm() {
