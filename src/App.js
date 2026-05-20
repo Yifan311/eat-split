@@ -23,9 +23,9 @@ const initialFriends = [
   },
 ];
 
-function Button({ children, onClick }) {
+function Button({ children, onClick, type = "button" }) {
   return (
-    <button className="button" onClick={onClick}>
+    <button className="button" onClick={onClick} type={type}>
       {children}
     </button>
   );
@@ -126,7 +126,7 @@ function AddFriend({ onAddFriend }) {
         onChange={(e) => setImage(e.target.value)}
       />
 
-      <Button>Add</Button>
+      <Button type="submit">Add</Button>
     </form>
   );
 }
@@ -151,7 +151,7 @@ function FormSplitBill() {
         <option value="friend">Friend</option>
       </select>
 
-      <Button>Split bill</Button>
+      <Button type="submit">Split bill</Button>
     </form>
   );
 }
