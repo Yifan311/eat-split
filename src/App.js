@@ -165,14 +165,21 @@ function AddFriend({ onAddFriend }) {
   );
 }
 
+function roundToCents(value) {
+  return Math.round(value * 100) / 100;
+}
+
 function FormSplitBill({ selectedFriend, onSplitBill }) {
   const [bill, setBill] = useState("");
   const [paidByUser, setPaidByUser] = useState("");
 
   const billValue = Number(bill);
   const paidByUserValue = Number(paidByUser);
+
   const paidByFriend =
-    bill === "" || paidByUser === "" ? "" : billValue - paidByUserValue;
+    bill === "" || paidByUser === ""
+      ? ""
+      : roundToCents(billValue - paidByUserValue);
   const [whoIsPaying, setWhoIsPaying] = useState("user");
 
   function handleSubmit(e) {
@@ -186,9 +193,11 @@ function FormSplitBill({ selectedFriend, onSplitBill }) {
     )
       return;
 
-    onSplitBill(
-      whoIsPaying === "user" ? billValue - paidByUserValue : -paidByUserValue,
-    );
+    const splitAmount =
+      whoIsPaying === "user"
+        ? roundToCents(billValue - paidByUserValue)
+        : -roundToCents(paidByUserValue);
+    onSplitBill(splitAmount);
   }
   return (
     <form className="form-split-bill" onSubmit={handleSubmit}>
