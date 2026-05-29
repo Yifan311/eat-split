@@ -111,14 +111,14 @@ function Friend({ friend, onSelectFriend, selected }) {
       <h3>{friend.name}</h3>
       <p
         className={
-          friend.balance > 0 ? "red" : friend.balance < 0 ? "green" : ""
+          friend.balance > 0 ? "green" : friend.balance < 0 ? "red" : ""
         }
       >
         {friend.balance === 0
           ? `You and ${friend.name} are even`
           : friend.balance > 0
-            ? `You owe ${friend.name} $${friend.balance}`
-            : `${friend.name} owes you $${friend.balance * -1}`}
+            ? `${friend.name} owes you $${friend.balance}`
+            : `You owe ${friend.name} $${friend.balance * -1}`}
       </p>
       <Button onClick={() => onSelectFriend(friend)}>
         {isSelected ? "Close" : "Select"}
@@ -165,18 +165,39 @@ function AddFriend({ onAddFriend }) {
   );
 }
 
+function roundToCents(value) {
+  return Math.round(value * 100) / 100;
+}
+
 function FormSplitBill({ selectedFriend, onSplitBill }) {
   const [bill, setBill] = useState("");
   const [paidByUser, setPaidByUser] = useState("");
-  const paidByFriend = bill ? bill - paidByUser : "";
+
+  const billValue = Number(bill);
+  const paidByUserValue = Number(paidByUser);
+
+  const paidByFriend =
+    bill === "" || paidByUser === ""
+      ? ""
+      : roundToCents(billValue - paidByUserValue);
   const [whoIsPaying, setWhoIsPaying] = useState("user");
-  
+
   function handleSubmit(e) {
     e.preventDefault();
 
-    if (!bill || !paidByUser) return;
+    if (!Number.isFinite(billValue) || billValue <= 0) return;
+    if (
+      !Number.isFinite(paidByUserValue) ||
+      paidByUserValue < 0 ||
+      paidByUserValue > billValue
+    )
+      return;
 
-    onSplitBill(whoIsPaying === "user" ? -paidByFriend : paidByUser);
+    const splitAmount =
+      whoIsPaying === "user"
+        ? roundToCents(billValue - paidByUserValue)
+        : -roundToCents(paidByUserValue);
+    onSplitBill(splitAmount);
   }
   return (
     <form className="form-split-bill" onSubmit={handleSubmit}>
@@ -184,20 +205,21 @@ function FormSplitBill({ selectedFriend, onSplitBill }) {
 
       <label>💰 Bill value</label>
       <input
-        type="text"
+        type="number"
+        min="0"
+        step="0.01"
         value={bill}
-        onChange={(e) => setBill(Number(e.target.value))}
+        onChange={(e) => setBill(e.target.value)}
       />
 
       <label>🧍‍♀️ Your expense</label>
       <input
-        type="text"
+        type="number"
+        min="0"
+        max={bill || undefined}
+        step="0.01"
         value={paidByUser}
-        onChange={(e) =>
-          setPaidByUser(
-            Number(e.target.value) > bill ? paidByUser : Number(e.target.value),
-          )
-        }
+        onChange={(e) => setPaidByUser(e.target.value)}
       />
 
       <label>👫 {selectedFriend.name}'s expense</label>
